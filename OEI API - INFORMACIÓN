@@ -1,0 +1,417 @@
+Crear Estructuras:
+(Se crean las estructuras para validar en la petición de selección que los valores sean los correctos)
+
+rails g scaffold School name:string
+rails g scaffold Type name:string
+rails g scaffold SchoolType school:references type:references
+rails g scaffold Criterion name:string description:string
+rails g scaffold Course name:string type:references
+rails g scaffold Edition date:date course:references
+
+Crear Schools:
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/schools -d '{"name": "educacion"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/schools -d '{"name": "lenguas"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/schools -d '{"name": "ciencia-y-cultura"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/schools -d '{"name": "cooperacion"}'
+
+Crear Types: 
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "infantil"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "competencias-digitales"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "gobernanza"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "portugues"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "educacion-artistica"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "divulgacion-cientifica"}'
+curl -i -H "Content-Type:application/json" -X POST http://localhost:3000/api/v1/types -d '{"name": "cooperacion"}'
+
+
+Crear desde Postman SchoolTypes(Escuelas y Temáticas)
+
+Método POST http://localhost:3000/api/v1/school_types
+(seleaccionar la opción raw. Seleccionar la opción JSON(applicationjson))
+
+Body
+
+{
+ "SchoolTypes":[ 
+ 	{
+	
+	"school_name": "educacion",
+	
+	"type_name": "infantil"
+	
+	}, 
+	{
+	
+	"school_name": "educacion",
+	
+	"type_name": "competencias-digitales"
+	
+	},
+	{
+	
+	"school_name": "educacion",
+	
+	"type_name": "gobernanza"
+	
+	},
+	{
+	
+	"school_name": "lenguas",
+	
+	"type_name": "portugues"
+	
+	},
+	{
+	
+	"school_name": "ciencia-y-cultura",
+	
+	"type_name": "educacion-artistica"
+	
+	},
+	{
+	
+	"school_name": "ciencia-y-cultura",
+	
+	"type_name": "divulgacion-cientifica"
+	
+	},
+	{
+	
+	"school_name": "cooperacion",
+	
+	"type_name": "cooperacion"
+	
+	}
+   ]	
+}
+
+
+Crear Criterions (criterios) En Postman
+
+Método POST http://localhost:3000/api/v1/criterions
+
+(seleaccionar la opción raw. Seleccionar la opción JSON(applicationjson))
+Body
+
+{
+ "Criterions":[ 
+ 	{
+	
+	"name": "closest",
+	
+	"description": "Selecciona los cursos de la próxima edición"
+	
+	}, 
+	{
+	
+	"name": "latest",
+	
+	"description": "Selecciona los cursos más alejados de la fecha actual"
+	
+	},
+	{
+	
+	"name": "type-name",
+	
+	"description": "Selecciona los cursos del tipo indicado"
+	
+	},
+	{
+	
+	"name": "school-name",
+	
+	"description": "Selecciona los cursos de la escuela indicada"
+	
+	}
+   ]	
+}
+
+
+Crear Courses (cursos) En Postman
+
+Método POST http://localhost:3000/api/v1/courses
+
+(seleaccionar la opción raw. Seleccionar la opción JSON(applicationjson))
+
+{
+ "Courses":[ 
+ 	{
+	
+	"name": "Especialista en cooperación internacional",
+	
+	"type": "cooperacion"
+	
+	}, 
+	{
+	
+	"name": "Comprendiendo el portugués",
+	
+	"type": "portugues"
+	
+	},
+	{
+	
+	"name": "Divulgación y cooperación de la ciencia",
+	
+	"type": "divulgacion-cientifica"
+	
+	},
+	{
+	
+	"name": "Competencias digitales para la educación",
+	
+	"type": "competencias-digitales"
+	
+	}
+   ]	
+}
+
+
+
+
+Selección de cursos ofertados Edition En Postman
+
+Método POST http://localhost:3000/api/v1/editions
+
+(seleaccionar la opción raw. Seleccionar la opción JSON(applicationjson))
+
+- Caso 1:
+El caso: {"criteria":["closest"],"editions":[{"date":"2021-06-01","courses":[{"name":"Especialista en cooperación internacional","type": "cooperacion"}]},{"date":"2023-09-01","courses":[{"name": "Comprendiendo el portugués","type": "portugues"}]}]}|[{"date": "2023-09-01","courses":["Comprendiendo el portugués"]}]
+
+da el error: 
+{
+    "status": 400,
+    "error": "Bad Request",
+    "exception": "#<ActionDispatch::ParamsParser::ParseError: 765: unexpected token at '|[{\"date\": \"2023-09-01\",\"courses\":[\"Comprendiendo el portugués\"]}]\n'>",
+
+
+
+Se actualizó el formato a:
+
+{
+  "criteria":["closest"],
+  "editions":[
+             {
+              "date":"2021-06-01",
+              "courses":[
+                        {
+                         "name":"Especialista en cooperación internacional",
+                         "type": "cooperacion"
+                        }] 
+             },
+            {
+             "date":"2023-09-01",
+             "courses":[
+                       {
+                        "name": "Comprendiendo el portugués",
+                        "type": "portugues"
+                       }] 
+            },
+            {
+             "date": "2023-09-01",
+             "courses":[ 
+                       {
+                        "name": "Comprendiendo el portugués"
+                       }]
+             }]
+}
+
+
+Salida generada en formato JSON sin validar la estructura:
+
+[
+    {
+        "date": "2021-06-01",
+        "courses": "Especialista en cooperación internacional"
+    }
+]
+
+
+
+Salida generada en formato JSON validando la estructura:
+
+{
+    "success": false,
+    "message": [
+        "Falta el type en la estructura para el curso  Comprendiendo el portugués. "
+    ]
+}
+
+
+- Caso 2
+El caso:  {"criteria":["latest"],"editions":[{"date":"2023-06-01","courses":[{"name":"Especialista en cooperación internacional","type": "cooperacion"}]},{"date":"2023-09-01","courses":[{"name": "Comprendiendo el portugués","type": "portugues"}]}]}|[{"date": "2023-09-01","courses":["Comprendiendo el portugués"]}]
+
+da el error:
+
+{
+    "status": 400,
+    "error": "Bad Request",
+    "exception": "#<ActionDispatch::ParamsParser::ParseError: 765: unexpected token at '|[{\"date\": \"2023-09-01\",\"courses\":[\"Comprendiendo el portugués\"]}]\n'>",
+
+
+Se actualizó el formato a:
+
+
+{
+ "criteria":["latest"],
+ "editions":[
+            {
+             "date":"2023-06-01",
+             "courses":[
+                       {
+                        "name":"Especialista en cooperación internacional",
+       		        	"type":"cooperacion"
+                       }]
+            },
+            {
+             "date":"2023-09-01",
+             "courses":[
+                       {
+                        "name": "Comprendiendo el portugués",
+                        "type": "portugues"
+                       }]
+            },
+            {
+             "date": "2023-09-01",
+             "courses":["Comprendiendo el portugués"]
+            }]
+}            
+
+
+Salida generada en formato JSON validando la estructura:
+
+{
+    "success": false,
+    "message": [
+        "Falta el name en la estructura para la editions 2023-09-01. "
+    ]
+}
+
+
+
+- Caso 3
+el caso:  {"criteria":["type-divulgacion-cientifica"],"editions":[{"date":"2023-06-01","courses":[{"name":"Especialista en cooperación internacional","type":"cooperacion"},{"name":"Divulgación y cooperación de la ciencia","type":"divulgacion-cientifica"}]},{"date":"2023-09-01","courses":[{"name":"Comprendiendo el portugués","type":"portugues"},{"name":"Divulgación y cooperación en la ciencia","type":"divulgacion-cientifica"}]}]}|[{"date":"2023-06-01","courses":["Divulgación y cooperación en la ciencia"]},{"date":"2023-09-01","courses":["Divulgación y cooperación en la ciencia"]}]
+
+da el error:
+
+{
+    "status": 400,
+    "error": "Bad Request",
+    "exception": "#<ActionDispatch::ParamsParser::ParseError: 765: unexpected token at '|[{\"date\":\"2023-06-01\",\"courses\":[\"Divulgación y cooperación en la ciencia\"]},{\"date\":\"2023-09-01\",\"courses\":[\"Divulgación y cooperación en la ciencia\"]}]\n'>",
+
+
+Se actualizó el formato a:
+
+{
+ "criteria":["type-divulgacion-cientifica"],
+ "editions":[
+             {
+              "date":"2023-06-01",
+              "courses":[
+                        {
+                         "name":"Especialista en cooperación internacional",
+                         "type":"cooperacion"
+                        },
+                        {
+                         "name":"Divulgación y cooperación de la ciencia",
+                         "type":"divulgacion-cientifica"
+                        }]
+             },
+             {
+              "date":"2023-09-01",
+              "courses":[
+                        {
+                         "name":"Comprendiendo el portugués",
+                         "type":"portugues"
+                        },
+                        {
+                         "name":"Divulgación y cooperación en la ciencia",
+                         "type":"divulgacion-cientifica"
+                        }]
+             },           
+             {
+              "date":"2023-06-01",
+              "courses":["Divulgación y cooperación en la ciencia"]
+             },
+             {
+              "date":"2023-09-01",
+              "courses":["Divulgación y cooperación en la ciencia"]
+             }]
+}
+
+
+Salida generada en formato JSON validando la estructura:
+
+{
+    "success": false,
+    "message": [
+        "Falta el name y el type en la estructura para la editions 2023-06-01. ",
+        "Falta el name y el type en la estructura para la editions 2023-09-01. "
+    ]
+}
+
+
+
+
+CASO 4
+
+El caso:  {"criteria":["closest","school-cooperacion"],"editions":[{"date":"2023-06-01","courses":[{"name":"Especialista en cooperación internacional","type":"cooperacion"},{"name":"Divulgación y cooperación de la ciencia","type":"divulgacion-cientifica"}]},{"date":"2023-09-01","courses":[{"name":"Comprendiendo el portugués","type":"portugues"},{"name":"Competencias digitales para la educación","type":"competencias-digitales"}]}]}|[{"date": "2023-06-01","courses":["Especialista en cooperación internacional"]}]
+
+
+Da el error:
+
+{
+    "status": 400,
+    "error": "Bad Request",
+    "exception": "#<ActionDispatch::ParamsParser::ParseError: 765: unexpected token at '|[{\"date\": \"2023-06-01\",\"courses\":[\"Especialista en cooperación internacional\"]}]\n'>",
+    "traces": {
+
+
+Se actualizó el formato a:
+
+
+{
+ "criteria":["closest","school-cooperacion"],
+ "editions":[
+            {
+             "date":"2023-06-01",
+             "courses":[
+                       {
+                        "name":"Especialista en cooperación internacional",
+                        "type":"cooperacion"
+                       },
+                       {
+                        "name":"Divulgación y cooperación de la ciencia",
+                        "type":"divulgacion-cientifica"
+                       }]
+             },
+             {
+              "date":"2023-09-01",
+              "courses":[
+                        {
+                         "name":"Comprendiendo el portugués",
+                         "type":"portugues"
+                        },
+                        {
+                         "name":"Competencias digitales para la educación",
+                         "type":"competencias-digitales"
+                        }]
+             },
+             {
+              "date": "2023-06-01",
+              "courses":["Especialista en cooperación internacional"]
+             }]
+
+}
+
+
+Salida generada en formato JSON validando la estructura:
+
+{
+    "success": false,
+    "message": [
+        "Falta el name y el type en la estructura para la editions 2023-06-01. "
+    ]
+}
+
+
